@@ -65,3 +65,52 @@ pub fn get_unique_file_name(base_name: &str, extension: Option<&str>) -> String 
 
     file_name
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::crypt;
+    use super::*;
+
+    #[test]
+    fn test_get_unique_file_name() {
+        let base_name = "test_file.txt";
+        let binding = crate::APP_NAME.to_lowercase();
+        let extension = Some(binding.as_str());
+        let unique_name = get_unique_file_name(base_name, extension);
+        assert!(unique_name.starts_with(base_name));
+        assert!(unique_name.ends_with(extension.unwrap()));
+    }
+
+    // Test saving and loading unencrypted files
+    #[test]
+    fn test_file_save_load_unencryted() {
+        // Save the unencrypted file
+        let sample_contents = vec![1, 2, 3, 4, 5];
+        let base_name = "test_file.txt";
+        let test_file_path = get_unique_file_name(base_name, None);
+        save_unencrypted(&sample_contents, &test_file_path).unwrap();
+
+        // Load the unencrypted file and check the contents
+        let loaded_contents = load_unencrypted(&test_file_path).unwrap();
+        assert_eq!(sample_contents, loaded_contents);
+        std::fs::remove_file(test_file_path).unwrap(); // Clean up the test file
+    }
+
+    // Test saving and loading encrypted files
+    #[test]
+    fn test_file_save_load_encrypted() {
+        // Save the encrypted file with a header
+        let sample_header = Header::new(crypt::CIPHER, crypt::KEY_SIZE, crypt::MODE, crypt::KDF, &crate::argon2::DEFAULT_M_COST, &crate::argon2::DEFAULT_T_COST, &crate::argon2::DEFAULT_P_COST, &[0; 16], &[0; 16]);
+        let sample_contents = vec![1, 2, 3, 4, 5];
+        let base_name = "test_file.txt";
+        let test_file_path = get_unique_file_name(base_name, Some(crate::APP_NAME.to_lowercase().as_str()));
+        save_encrypted(&sample_header, &sample_contents, &test_file_path).unwrap();
+
+        // Load the encrypted file and check the header and contents
+        let (loaded_header, loaded_contents) = load_encrypted(&test_file_path).unwrap();
+        assert!(loaded_header.is_supported());
+        assert!(loaded_header.check_integrity());
+        assert_eq!(sample_contents, loaded_contents);
+        std::fs::remove_file(test_file_path).unwrap(); // Clean up the test file
+    }
+}

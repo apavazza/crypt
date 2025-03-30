@@ -28,3 +28,27 @@ pub fn generate_key(m_cost: u32, t_cost: u32, p_cost: u32, output_len: Option<us
 pub fn generate_salt() -> SaltString {
     SaltString::generate(&mut OsRng)
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::crypt;
+    use super::*;
+
+    #[test]
+    fn test_generate_salt() {
+        let salt = generate_salt();
+        assert_eq!(salt.len(), 22);
+    }
+
+    #[test]
+    fn test_generate_key() {
+        let password = b"password";
+        let salt = generate_salt();
+        let m_cost = DEFAULT_M_COST;
+        let t_cost = DEFAULT_T_COST;
+        let p_cost = DEFAULT_P_COST;
+        let key_size: usize = crypt::KEY_SIZE.try_into().unwrap();
+        let key = generate_key(m_cost, t_cost, p_cost, Some(key_size), password, salt.as_bytes()).unwrap();
+        assert_eq!(key.len(), key_size);
+    }
+}

@@ -44,6 +44,12 @@ To compile the program run
 cargo build --release
 ```
 
+To run tests run
+
+```shell
+cargo test
+```
+
 ## License
 
 This software is provided under the terms of the [GNU General Public License v3.0](LICENSE).

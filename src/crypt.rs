@@ -5,10 +5,10 @@ use crate::file;
 use crate::header;
 use crate::password;
 
-const CIPHER : &str = "AES";
-const KEY_SIZE : u32 = 32;
-const MODE : &str = "CBC";
-const KDF : &str = "Argon2id";
+pub const CIPHER : &str = "AES";
+pub const KEY_SIZE : u32 = 32;
+pub const MODE : &str = "CBC";
+pub const KDF : &str = "Argon2id";
 
 pub fn encrypt(input_file: &str) -> Result<(), Box<dyn std::error::Error>> {
     let m_cost = argon2::DEFAULT_M_COST;
@@ -50,7 +50,7 @@ pub fn decrypt(input_file: &str) -> Result<(), Box<dyn std::error::Error>> {
     let t_cost = header.get_t_cost();
     let p_cost = header.get_p_cost();
     let salt = header.get_salt();
-    let key = argon2::generate_key(m_cost, t_cost, p_cost, Some(32), password.as_bytes(), &salt).unwrap();
+    let key = argon2::generate_key(m_cost, t_cost, p_cost, Some(KEY_SIZE.try_into().unwrap()), password.as_bytes(), &salt).unwrap();
     let iv = header.get_iv();
     let plaintext = aes::decrypt(ciphertext, &key, &iv).unwrap();
 
@@ -58,6 +58,7 @@ pub fn decrypt(input_file: &str) -> Result<(), Box<dyn std::error::Error>> {
     let base_name = input_file.strip_suffix(&format!(".{}", crate::APP_NAME.to_lowercase())).unwrap_or(input_file);
     let output_file = file::get_unique_file_name(base_name, None);
 
+    // Save the decrypted file
     let result = file::save_unencrypted(&plaintext, &output_file);
     if result.is_err() {
         eprintln!("Failed to save decrypted file.");

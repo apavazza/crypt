@@ -121,3 +121,35 @@ impl Header {
     }
     
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_header_creation() {
+        let cipher = "AES";
+        let key_size = 32;
+        let mode = "CBC";
+        let kdf = "Argon2id";
+        let m_cost = 4096;
+        let t_cost = 3;
+        let p_cost = 1;
+        let salt = vec![0; 16];
+        let iv = vec![0; 16];
+
+        let header = Header::new(cipher, key_size, mode, kdf, &m_cost, &t_cost, &p_cost, &salt, &iv);
+        assert_eq!(header.app, crate::APP_NAME.to_string());
+        assert_eq!(header.version, crate::APP_VERSION.to_string());
+        assert_eq!(header.cipher, cipher);
+        assert_eq!(header.key_size, key_size);
+        assert_eq!(header.mode, mode);
+        assert_eq!(header.kdf, kdf);
+        assert_eq!(header.m_cost, m_cost);
+        assert_eq!(header.t_cost, t_cost);
+        assert_eq!(header.p_cost, p_cost);
+        assert_eq!(header.salt, salt);
+        assert_eq!(header.iv, iv);
+        assert_eq!(header.integrity.len(), 32); // SHA3-256 produces a 32-byte hash
+    }
+}
