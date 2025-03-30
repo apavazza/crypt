@@ -1,0 +1,21 @@
+[package]
+name = "crypt"
+version = "0.1.0"
+description = "A file encryption and decryption tool using AES and Argon2id."
+license = "GPL-3.0"
+edition = "2024"
+
+[dependencies]
+aes = "0.7"
+block-modes = "0.8"
+block-padding = "0.2"
+hex = "0.4"
+argon2 = "0.3"
+rand = "0.8"
+serde = { version = "1.0.104", features = ["derive"] }
+serde_json = "1.0.140"
+prettytable = "0.10"
+rpassword = "7.0"
+clap = { version = "4.3", features = ["derive"] }
+sha3 = "0.10"
+semver = "1.0"
