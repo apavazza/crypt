@@ -2,6 +2,8 @@
 
 A file encryption and decryption tool using AES and Argon2id
 
+[![Tests](https://github.com/apavazza/crypt/actions/workflows/tests.yml/badge.svg)](https://github.com/apavazza/crypt/actions/workflows/tests.yml)
+
 ## Usage
 
 ### Encrypting a file
