@@ -142,7 +142,7 @@ mod tests {
         assert_eq!(header.app, crate::APP_NAME.to_string());
         assert_eq!(header.version, crate::APP_VERSION.to_string());
         assert_eq!(header.cipher, cipher);
-        assert_eq!(header.key_size, key_size);
+        assert_eq!(header.key_size, key_size * 8);
         assert_eq!(header.mode, mode);
         assert_eq!(header.kdf, kdf);
         assert_eq!(header.m_cost, m_cost);
