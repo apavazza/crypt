@@ -6,9 +6,9 @@ A file encryption and decryption tool using AES and Argon2id
 
 ## Usage
 
-### Encrypting a file
+### Encrypting a File
 
-To encrypt a file run
+To encrypt a file, run:
 
 ```shell
 crypt encrypt <filename>
@@ -20,9 +20,9 @@ or
 crypt e <filename>
 ```
 
-### Decrypting a file
+### Decrypting a File
 
-To decrypt a file run
+To decrypt a file, run:
 
 ```shell
 crypt decrypt <filename>
@@ -34,19 +34,32 @@ or
 crypt d <filename>
 ```
 
+### Examining File Headers
+
+To display the header information, run:
+```shell
+crypt header <filename>
+```
+
+or
+
+```shell
+crypt h <filename>
+```
+
 ## Encryption
 
 Files are encrypted using AES-256-CBC with argon2id hashing.
 
 ## Compiling
 
-To compile the program run
+To compile the program, run:
 
 ```shell
 cargo build --release
 ```
 
-To run tests run
+To run tests, run:
 
 ```shell
 cargo test
