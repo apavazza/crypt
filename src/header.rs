@@ -9,31 +9,31 @@ pub struct Header {
     app: String,
     version: String,
     cipher: String,
-    key_size: u32,
+    key_size: usize,
     mode: String,
     kdf: String,
     m_cost: u32,
     t_cost: u32,
     p_cost: u32,
     salt: Vec<u8>,
-    iv: Vec<u8>,
+    iv: [u8; crate::aes::BLOCK_SIZE],
     integrity: Vec<u8>,
 }
 
 impl Header {
-    pub fn new(cipher: &str, key_size: u32, mode: &str, kdf: &str, m_cost: &u32, t_cost: &u32, p_cost: &u32, salt: &[u8], iv: &[u8]) -> Self {
+    pub fn new(cipher: &str, key_size: usize, mode: &str, kdf: &str, m_cost: &u32, t_cost: &u32, p_cost: &u32, salt: &[u8], iv: [u8; crate::aes::BLOCK_SIZE]) -> Self {
         let mut header = Header {
             app: crate::APP_NAME.to_string(),
             version: crate::APP_VERSION.to_string(),
             cipher: cipher.to_string(),
-            key_size,
+            key_size: key_size * 8, // Convert bytes to bits
             mode: mode.to_string(),
             kdf: kdf.to_string(),
             m_cost: *m_cost,
             t_cost: *t_cost,
             p_cost: *p_cost,
             salt: salt.to_vec(),
-            iv: iv.to_vec(),
+            iv,
             integrity: Vec::new(),
         };
         let integrity = header.calculate_hash();
@@ -116,7 +116,7 @@ impl Header {
         self.salt.clone()
     }
 
-    pub fn get_iv(&self) -> Vec<u8> {
+    pub fn get_iv(&self) -> [u8; crate::aes::BLOCK_SIZE] {
         self.iv.clone()
     }
     
@@ -135,10 +135,10 @@ mod tests {
         let m_cost = 4096;
         let t_cost = 3;
         let p_cost = 1;
-        let salt = vec![0; 16];
-        let iv = vec![0; 16];
+        let salt = vec![0; 22];
+        let iv = [0u8; crate::aes::BLOCK_SIZE];
 
-        let header = Header::new(cipher, key_size, mode, kdf, &m_cost, &t_cost, &p_cost, &salt, &iv);
+        let header = Header::new(cipher, key_size, mode, kdf, &m_cost, &t_cost, &p_cost, &salt, iv);
         assert_eq!(header.app, crate::APP_NAME.to_string());
         assert_eq!(header.version, crate::APP_VERSION.to_string());
         assert_eq!(header.cipher, cipher);

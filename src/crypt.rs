@@ -6,7 +6,6 @@ use crate::header;
 use crate::password;
 
 pub const CIPHER : &str = "AES";
-pub const KEY_SIZE : u32 = 32;
 pub const MODE : &str = "CBC";
 pub const KDF : &str = "Argon2id";
 
@@ -16,11 +15,11 @@ pub fn encrypt(input_file: &str) -> Result<(), Box<dyn std::error::Error>> {
     let p_cost = argon2::DEFAULT_P_COST;
     let password = password::create();
     let contents = file::load_unencrypted(&input_file)?;
-    let salt = argon2::generate_salt();
-    let key = argon2::generate_key(m_cost, t_cost, p_cost, Some(KEY_SIZE.try_into().unwrap()), password.as_bytes(), &salt.as_bytes()).unwrap();
-    let iv = aes::generate_iv();
+    let salt = argon2::generate_salt().unwrap();
+    let key = argon2::generate_key(m_cost, t_cost, p_cost, Some(crate::aes::KEY_SIZE), password.as_bytes(), &salt).unwrap();
+    let iv: [u8; crate::aes::BLOCK_SIZE] = aes::generate_iv();
     let ciphertext = aes::encrypt(contents, &key, &iv).unwrap();
-    let header = header::Header::new(CIPHER, KEY_SIZE, MODE, KDF, &m_cost, &t_cost, &p_cost, &salt.as_bytes(), &iv);
+    let header = header::Header::new(CIPHER, crate::aes::KEY_SIZE, MODE, KDF, &m_cost, &t_cost, &p_cost, &salt, iv);
     let output_file = file::get_unique_file_name(input_file, Some(crate::APP_NAME.to_lowercase().as_str()));
     let result = file::save_encrypted(&header, &ciphertext, &output_file);
     if result.is_err() {
@@ -50,8 +49,8 @@ pub fn decrypt(input_file: &str) -> Result<(), Box<dyn std::error::Error>> {
     let t_cost = header.get_t_cost();
     let p_cost = header.get_p_cost();
     let salt = header.get_salt();
-    let key = argon2::generate_key(m_cost, t_cost, p_cost, Some(KEY_SIZE.try_into().unwrap()), password.as_bytes(), &salt).unwrap();
-    let iv = header.get_iv();
+    let key = argon2::generate_key(m_cost, t_cost, p_cost, Some(crate::aes::KEY_SIZE), password.as_bytes(), &salt).unwrap();
+    let iv: [u8; crate::aes::BLOCK_SIZE] = header.get_iv();
     let plaintext = aes::decrypt(ciphertext, &key, &iv).unwrap();
 
     // Determine the base name for the output file

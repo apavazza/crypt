@@ -68,7 +68,6 @@ pub fn get_unique_file_name(base_name: &str, extension: Option<&str>) -> String 
 
 #[cfg(test)]
 mod tests {
-    use crate::crypt;
     use super::*;
 
     #[test]
@@ -100,7 +99,7 @@ mod tests {
     #[test]
     fn test_file_save_load_encrypted() {
         // Save the encrypted file with a header
-        let sample_header = Header::new(crypt::CIPHER, crypt::KEY_SIZE, crypt::MODE, crypt::KDF, &crate::argon2::DEFAULT_M_COST, &crate::argon2::DEFAULT_T_COST, &crate::argon2::DEFAULT_P_COST, &[0; 16], &[0; 16]);
+        let sample_header = Header::new(crate::crypt::CIPHER, crate::aes::KEY_SIZE, crate::crypt::MODE, crate::crypt::KDF, &crate::argon2::DEFAULT_M_COST, &crate::argon2::DEFAULT_T_COST, &crate::argon2::DEFAULT_P_COST, &[0; 22], [0; crate::aes::BLOCK_SIZE]);
         let sample_contents = vec![1, 2, 3, 4, 5];
         let base_name = "test_file.txt";
         let test_file_path = get_unique_file_name(base_name, Some(crate::APP_NAME.to_lowercase().as_str()));

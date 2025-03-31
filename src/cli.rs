@@ -4,7 +4,6 @@ use clap::{Parser, Subcommand};
 #[command(name = crate::APP_NAME)]
 #[command(version = crate::APP_VERSION)]
 #[command(about = crate::APP_DESCRIPTION, long_about = None)]
-
 pub struct Cli {
     /// The command to run (encrypt, decrypt, header)
     #[command(subcommand)]
