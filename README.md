@@ -3,6 +3,7 @@
 A file encryption and decryption tool using AES and Argon2id
 
 [![Tests](https://github.com/apavazza/crypt/actions/workflows/tests.yml/badge.svg)](https://github.com/apavazza/crypt/actions/workflows/tests.yml)
+![Rust version](https://img.shields.io/badge/Rust-1.85.1-brightgreen.svg)
 
 ## Usage
 
