@@ -13,8 +13,8 @@ pub fn encrypt(input_file: &str) -> Result<(), Box<dyn std::error::Error>> {
     let m_cost = argon2::DEFAULT_M_COST;
     let t_cost = argon2::DEFAULT_T_COST;
     let p_cost = argon2::DEFAULT_P_COST;
-    let password = password::create();
     let contents = file::load_unencrypted(&input_file)?;
+    let password = password::create();
     let salt = argon2::generate_salt().unwrap();
     let key = argon2::generate_key(m_cost, t_cost, p_cost, Some(crate::aes::KEY_SIZE), password.as_bytes(), &salt).unwrap();
     let iv: [u8; crate::aes::BLOCK_SIZE] = aes::generate_iv();
@@ -31,7 +31,10 @@ pub fn encrypt(input_file: &str) -> Result<(), Box<dyn std::error::Error>> {
 }
 
 pub fn decrypt(input_file: &str) -> Result<(), Box<dyn std::error::Error>> {
-    let (header, ciphertext) = file::load_encrypted(input_file)?;
+    let (header, ciphertext) = file::load_encrypted(input_file).unwrap_or_else(|e| {
+        println!("{}", e);
+        exit(0);
+    });
     if !header.is_supported() {
         eprintln!("This encryption format is not supported.");
         eprintln!("File may be encrypted with a different version of {}.", crate::APP_NAME);

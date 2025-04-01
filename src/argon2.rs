@@ -1,7 +1,6 @@
 use argon2::{Argon2, Algorithm, Params};
 use rand::{rngs::OsRng, TryRngCore};
 
-
 pub const DEFAULT_M_COST: u32 = 4096;
 pub const DEFAULT_T_COST: u32 = 100;
 pub const DEFAULT_P_COST: u32 = 16;

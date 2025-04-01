@@ -1,16 +1,11 @@
 use std::fs::File;
 use std::io::{self, Read, Write};
 use std::path::Path;
-
+use std::process::exit;
 use crate::header::Header;
 
-
 pub fn load_unencrypted(path: &str) -> io::Result<Vec<u8>> {
-    let mut file = File::open(path).expect("File not found.");
-    let mut contents = Vec::new();
-    file.read_to_end(&mut contents).unwrap();
-
-    Ok(contents)
+    Ok(load_content(path))
 }
 
 pub fn save_encrypted(header: &Header, contents: &Vec<u8>, path: &str) -> std::io::Result<()> {
@@ -23,9 +18,7 @@ pub fn save_encrypted(header: &Header, contents: &Vec<u8>, path: &str) -> std::i
 }
 
 pub fn load_encrypted(path: &str) -> std::io::Result<(Header, Vec<u8>)> {
-    let mut file = File::open(path)?;
-    let mut contents = Vec::new();
-    file.read_to_end(&mut contents)?;
+    let contents = load_content(path);
 
     // Deserialize the header
     let header_end = contents.iter().position(|&b| b == b'\n').ok_or_else(|| {
@@ -41,6 +34,17 @@ pub fn load_encrypted(path: &str) -> std::io::Result<(Header, Vec<u8>)> {
     Ok((header, body_bytes.to_vec()))
 }
 
+fn load_content(path: &str) -> Vec<u8> {
+    let mut file = File::open(path).unwrap_or_else(|e| -> File {
+        println!("{}", e);
+        exit(0);
+    });
+
+    let mut contents = Vec::new();
+    file.read_to_end(&mut contents).unwrap();
+    contents
+}
+
 pub fn save_unencrypted(plaintext: &Vec<u8>, path: &str) -> std::io::Result<()> {
     let mut file = File::create(path)?;
     file.write_all(plaintext)?;
@@ -54,11 +58,25 @@ pub fn get_unique_file_name(base_name: &str, extension: Option<&str>) -> String 
     };
     let mut counter = 1;
 
+    let dot_count: usize = base_name.chars().filter(|&c| c == '.').count();
+    let base_name_without_ext:String;
+    let base_ext;
+    if dot_count >=2 {
+        let parts: Vec<&str> = base_name.split('.').collect();
+        base_name_without_ext = parts[..parts.len() - 1].join(".");
+        base_ext = parts[parts.len() - 1];
+    } else {
+        base_name_without_ext = base_name.to_string();
+        base_ext = "";
+    }
+
     // Check if the file already exists
     while Path::new(&file_name).exists() {
         file_name = match extension {
-            Some(ext) => format!("{}({}).{}", base_name, counter, ext),
-            None => format!("{}({})", base_name, counter),
+            Some(ext) => {
+                format!("{}({}){}{}.{}", base_name_without_ext, counter, if dot_count == 1 {""} else {"."}, base_ext, ext)
+            },
+            None => format!("{}({}).{}", base_name_without_ext, counter, base_ext),
         };
         counter += 1;
     }
