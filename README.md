@@ -2,7 +2,7 @@
 
 [![Tests](https://github.com/apavazza/crypt/actions/workflows/tests.yml/badge.svg)](https://github.com/apavazza/crypt/actions/workflows/tests.yml)
 [![Build](https://github.com/apavazza/crypt/actions/workflows/build-and-release.yml/badge.svg)](https://github.com/apavazza/crypt/actions/workflows/build-and-release.yml)
-![Rust version](https://img.shields.io/badge/Rust-1.85+-dea584.svg)
+![Rust version](https://img.shields.io/badge/Rust-1.85%2B-dea584.svg)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](LICENSE)
 
 A file encryption and decryption tool using AES and Argon2id
