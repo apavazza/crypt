@@ -1,5 +1,4 @@
-name: Build and Create Release
-
+name: Build
 on:
   push:
     tags:
